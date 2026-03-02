@@ -7,18 +7,18 @@ All intefaces are deployed using Github Pages at [dark-pattern-interfaces](https
 
 ### Scenario 1 – App Permissions
 
-* [Control Version](s1_control_app_permissions.html)
-* [Dark Pattern Version](s1_dark_app_permissions.html)
+* [Control Version](https://nehakotwal.github.io/dark-patterns-study/s1_control_app_permissions.html)
+* [Dark Pattern Version](https://nehakotwal.github.io/dark-patterns-study/s1_dark_app_permissions.html)
 
 ### Scenario 2 – Cookie Consent
 
-* [Control Version](s2_control_cookie_consent.html)
-* [Dark Pattern Version](s2_dark_cookie_consent.html)
+* [Control Version](https://nehakotwal.github.io/dark-patterns-study/s2_control_cookie_consent.html)
+* [Dark Pattern Version](https://nehakotwal.github.io/dark-patterns-study/s2_dark_cookie_consent.html)
 
 ### Scenario 3 – Privacy Settings
 
-* [Control Version](s3_control_privacy_settings.html)
-* [Dark Pattern Version](s3_dark_privacy_settings.html)
+* [Control Version](https://nehakotwal.github.io/dark-patterns-study/s3_control_privacy_settings.html)
+* [Dark Pattern Version](https://nehakotwal.github.io/dark-patterns-study/s3_dark_privacy_settings.html)
 
 ---
 
