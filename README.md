@@ -3,6 +3,8 @@ Study of various dark patterns in websites and it's security implications
 
 ## Study Interfaces
 
+All intefaces are deployed using Github Pages at [dark-pattern-interfaces](https://nehakotwal.github.io/dark-patterns-study/)
+
 ### Scenario 1 – App Permissions
 
 * [Control Version](s1_control_app_permissions.html)
