@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connect Hub - Permissions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .phone-frame {
+    width: 375px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .app-header {
+    background: linear-gradient(135deg, #4A90D9, #357ABD);
+    color: white;
+    padding: 28px 24px 20px;
+    text-align: center;
+  }
+  
+  .app-icon {
+    width: 56px; height: 56px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 14px;
+    margin: 0 auto 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+  
+  .app-header h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .app-header p { font-size: 13px; opacity: 0.85; }
+  
+  .permissions-list { padding: 16px 20px; }
+  
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+  
+  .permission-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e8eaed;
+    transition: all 0.2s;
+  }
+  
+  .permission-item:hover { border-color: #ccc; }
+  
+  .perm-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-right: 14px;
+    flex-shrink: 0;
+  }
+  
+  .perm-icon.camera { background: #e3f2fd; }
+  .perm-icon.location { background: #fce4ec; }
+  .perm-icon.contacts { background: #e8f5e9; }
+  .perm-icon.microphone { background: #fff3e0; }
+  .perm-icon.photos { background: #f3e5f5; }
+  
+  .perm-info { flex: 1; margin-right: 12px; }
+  .perm-info h3 { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .perm-info p { font-size: 12px; color: #666; line-height: 1.4; }
+  .perm-info .deny-note { font-size: 11px; color: #888; font-style: italic; margin-top: 3px; }
+  
+  .perm-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  
+  .btn-allow, .btn-deny {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  
+  .btn-allow {
+    background: #4A90D9;
+    color: white;
+    border-color: #4A90D9;
+  }
+  .btn-allow:hover { background: #357ABD; border-color: #357ABD; }
+  .btn-allow.selected { background: #2e7d32; border-color: #2e7d32; }
+  
+  .btn-deny {
+    background: white;
+    color: #4A90D9;
+    border-color: #4A90D9;
+  }
+  .btn-deny:hover { background: #f0f6ff; }
+  .btn-deny.selected { background: #c62828; color: white; border-color: #c62828; }
+  
+  .footer {
+    padding: 16px 20px 24px;
+    border-top: 1px solid #eee;
+  }
+  
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: #4A90D9;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn-submit:hover { background: #357ABD; }
+  .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+  
+  .result-msg {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+    color: #333;
+  }
+  .result-msg.show { display: block; }
+  
+  .timestamp { display: none; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame" id="app">
+  <div class="app-header">
+    <div class="app-icon">🔗</div>
+    <h1>Connect Hub</h1>
+    <p>would like to access the following</p>
+  </div>
+  
+  <div class="permissions-list">
+    <div class="section-label">Review each permission individually</div>
+    
+    <div class="permission-item" data-perm="camera">
+      <div class="perm-icon camera">📷</div>
+      <div class="perm-info">
+        <h3>Camera</h3>
+        <p>Take photos and videos for posts</p>
+        <div class="deny-note">If denied: You can still use the app but cannot take photos within it</div>
+      </div>
+      <div class="perm-actions">
+        <button class="btn-allow" onclick="toggle(this,'camera','allow')">Allow</button>
+        <button class="btn-deny" onclick="toggle(this,'camera','deny')">Deny</button>
+      </div>
+    </div>
+    
+    <div class="permission-item" data-perm="location">
+      <div class="perm-icon location">📍</div>
+      <div class="perm-info">
+        <h3>Location (Always)</h3>
+        <p>Access your location at all times, even when app is closed</p>
+        <div class="deny-note">If denied: Location-based features will be unavailable, but core features still work</div>
+      </div>
+      <div class="perm-actions">
+        <button class="btn-allow" onclick="toggle(this,'location','allow')">Allow</button>
+        <button class="btn-deny" onclick="toggle(this,'location','deny')">Deny</button>
+      </div>
+    </div>
+    
+    <div class="permission-item" data-perm="contacts">
+      <div class="perm-icon contacts">👥</div>
+      <div class="perm-info">
+        <h3>Contacts</h3>
+        <p>Find friends who also use Connect Hub</p>
+        <div class="deny-note">If denied: You can still search for and add friends manually</div>
+      </div>
+      <div class="perm-actions">
+        <button class="btn-allow" onclick="toggle(this,'contacts','allow')">Allow</button>
+        <button class="btn-deny" onclick="toggle(this,'contacts','deny')">Deny</button>
+      </div>
+    </div>
+    
+    <div class="permission-item" data-perm="microphone">
+      <div class="perm-icon microphone">🎙️</div>
+      <div class="perm-info">
+        <h3>Microphone</h3>
+        <p>Record audio for video posts and voice messages</p>
+        <div class="deny-note">If denied: You can still use text-based features normally</div>
+      </div>
+      <div class="perm-actions">
+        <button class="btn-allow" onclick="toggle(this,'microphone','allow')">Allow</button>
+        <button class="btn-deny" onclick="toggle(this,'microphone','deny')">Deny</button>
+      </div>
+    </div>
+    
+    <div class="permission-item" data-perm="photos">
+      <div class="perm-icon photos">🖼️</div>
+      <div class="perm-info">
+        <h3>Photo Library</h3>
+        <p>Upload existing photos to your profile and posts</p>
+        <div class="deny-note">If denied: You cannot upload photos but can still browse and interact</div>
+      </div>
+      <div class="perm-actions">
+        <button class="btn-allow" onclick="toggle(this,'photos','allow')">Allow</button>
+        <button class="btn-deny" onclick="toggle(this,'photos','deny')">Deny</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <button class="btn-submit" id="submitBtn" onclick="submit()" disabled>Confirm Choices</button>
+  </div>
+  
+  <div class="result-msg" id="resultMsg"></div>
+</div>
+
+<div class="timestamp" id="timestamps"></div>
+
+<script>
+const startTime = Date.now();
+const choices = {};
+let clickCount = 0;
+const interactions = [];
+
+function toggle(btn, perm, action) {
+  clickCount++;
+  interactions.push({ time: Date.now() - startTime, perm, action, click: clickCount });
+  
+  const item = btn.closest('.permission-item');
+  const allows = item.querySelector('.btn-allow');
+  const denies = item.querySelector('.btn-deny');
+  
+  allows.classList.remove('selected');
+  denies.classList.remove('selected');
+  btn.classList.add('selected');
+  
+  choices[perm] = action;
+  
+  // Enable submit when all 5 are chosen
+  const allChosen = ['camera','location','contacts','microphone','photos'].every(p => choices[p]);
+  document.getElementById('submitBtn').disabled = !allChosen;
+}
+
+function submit() {
+  const endTime = Date.now();
+  const totalTime = ((endTime - startTime) / 1000).toFixed(1);
+  const granted = Object.values(choices).filter(v => v === 'allow').length;
+  
+  const data = {
+    condition: 'control',
+    scenario: 'app_permissions',
+    choices: choices,
+    permissionsGranted: granted,
+    permissionsDenied: 5 - granted,
+    totalTimeSeconds: parseFloat(totalTime),
+    totalClicks: clickCount,
+    interactions: interactions
+  };
+  
+  // Send to Qualtrics via postMessage
+  try {
+    window.parent.postMessage(JSON.stringify(data), '*');
+  } catch(e) {}
+  
+  // Show confirmation
+  document.querySelector('.permissions-list').style.display = 'none';
+  document.querySelector('.footer').style.display = 'none';
+  const msg = document.getElementById('resultMsg');
+  msg.innerHTML = `<strong>Choices saved!</strong><br><br>You allowed ${granted} of 5 permissions.<br>Time: ${totalTime}s | Interactions: ${clickCount}<br><br><em>Please continue to the next page of the survey.</em>`;
+  msg.classList.add('show');
+  
+  console.log('DATA:', JSON.stringify(data, null, 2));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stream View - Privacy Settings</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .settings-panel {
+    width: 420px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .panel-header {
+    background: #1a1a2e;
+    color: white;
+    padding: 24px;
+  }
+  
+  .panel-header .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  
+  .brand-icon {
+    width: 36px; height: 36px;
+    background: #e94560;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  
+  .panel-header h1 { font-size: 18px; font-weight: 700; }
+  .panel-header p { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+  
+  .settings-list { padding: 8px 24px; }
+  
+  .setting-item {
+    padding: 18px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .setting-item:last-child { border-bottom: none; }
+  
+  .setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .setting-info { flex: 1; margin-right: 16px; }
+  .setting-info h3 { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+  .setting-info p { font-size: 12px; color: #888; line-height: 1.4; }
+  
+  /* INTERFACE INTERFERENCE: "Recommended" badges push users toward less private options */
+  .recommended {
+    display: inline-block;
+    font-size: 9px;
+    background: #2e7d32;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 700;
+    margin-left: 6px;
+    text-transform: uppercase;
+  }
+  
+  /* INTERFACE INTERFERENCE: Warning messages for privacy-protective choices */
+  .warning-msg {
+    display: none;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #fff3e0;
+    border-left: 3px solid #ff9800;
+    border-radius: 0 6px 6px 0;
+    font-size: 11px;
+    color: #e65100;
+    line-height: 1.4;
+  }
+  .warning-msg.show { display: block; }
+  
+  .radio-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    transition: all 0.2s;
+  }
+  .radio-option:hover { background: #f8f8f8; }
+  .radio-option input { accent-color: #e94560; }
+  
+  /* INTERFACE INTERFERENCE: Public option is visually highlighted */
+  .radio-option.highlighted {
+    border-color: #2e7d32;
+    background: #f1f8f1;
+  }
+  
+  /* INTERFACE INTERFERENCE: Private option is visually muted */
+  .radio-option.muted {
+    opacity: 0.6;
+    border-color: #f0f0f0;
+  }
+  
+  .toggle-wrap {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+  .toggle-wrap input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #ccc;
+    border-radius: 26px;
+    transition: 0.3s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    height: 20px; width: 20px;
+    left: 3px; bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+  .toggle-wrap input:checked + .slider { background: #e94560; }
+  .toggle-wrap input:checked + .slider::before { transform: translateX(22px); }
+  
+  .panel-footer {
+    padding: 16px 24px 24px;
+    border-top: 1px solid #f0f0f0;
+  }
+  
+  /* INTERFACE INTERFERENCE: "Keep Recommended" is big and green, "Save Custom" is small and gray */
+  .btn-keep-recommended {
+    width: 100%;
+    padding: 14px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 8px;
+  }
+  .btn-keep-recommended:hover { background: #1b5e20; }
+  
+  .btn-save-custom {
+    width: 100%;
+    padding: 8px;
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-save-custom:hover { color: #999; }
+  
+  .result-msg {
+    display: none;
+    text-align: center;
+    padding: 24px;
+    font-size: 14px;
+    color: #333;
+  }
+  .result-msg.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="settings-panel" id="panel">
+  <div class="panel-header">
+    <div class="brand">
+      <div class="brand-icon">▶</div>
+      <h1>Stream View</h1>
+    </div>
+    <p>Optimize your experience settings</p>
+  </div>
+  
+  <div class="settings-list" id="settingsList">
+    <!-- Profile Visibility -->
+    <div class="setting-item">
+      <div class="setting-info">
+        <h3>Profile Visibility</h3>
+        <p>Choose who can discover and interact with your profile.</p>
+      </div>
+      <div class="radio-group">
+        <!-- INTERFACE INTERFERENCE: Public is highlighted with "Recommended" and pre-selected -->
+        <label class="radio-option highlighted">
+          <input type="radio" name="visibility" value="public" checked onchange="visChange('public')">
+          Public — Be discoverable by everyone <span class="recommended">Recommended</span>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="visibility" value="friends" onchange="visChange('friends')">
+          Friends Only
+        </label>
+        <!-- INTERFACE INTERFERENCE: Private option is muted/dimmed -->
+        <label class="radio-option muted">
+          <input type="radio" name="visibility" value="private" onchange="visChange('private')">
+          Private — Others won't find you
+        </label>
+      </div>
+      <!-- INTERFACE INTERFERENCE: Warning shows when picking private -->
+      <div class="warning-msg" id="visWarning">⚠️ Going private means friends won't be able to find you, and you may miss out on community features and social recommendations.</div>
+    </div>
+    
+    <!-- Watch History -->
+    <div class="setting-item">
+      <div class="setting-row">
+        <div class="setting-info">
+          <h3>Watch History Sharing <span class="recommended">Recommended</span></h3>
+          <p>Share what you're watching with your community. Helps friends discover great content!</p>
+        </div>
+        <!-- INTERFACE INTERFERENCE: Pre-enabled -->
+        <label class="toggle-wrap">
+          <input type="checkbox" checked data-setting="watch_history" onchange="toggleChange('watch_history', this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="warning-msg" id="watchWarning">⚠️ Disabling this means your friends won't see your activity and you'll lose access to the "Watch Together" feature.</div>
+    </div>
+    
+    <!-- Personalized Recommendations -->
+    <div class="setting-item">
+      <div class="setting-row">
+        <div class="setting-info">
+          <h3>Smart Recommendations <span class="recommended">Recommended</span></h3>
+          <p>Let us learn your taste to surface content you'll love.</p>
+        </div>
+        <!-- INTERFACE INTERFERENCE: Pre-enabled -->
+        <label class="toggle-wrap">
+          <input type="checkbox" checked data-setting="recommendations" onchange="toggleChange('recommendations', this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="warning-msg" id="recoWarning">⚠️ Without personalization, your home feed will show generic popular content instead of shows tailored to your interests.</div>
+    </div>
+    
+    <!-- Partner Data Sharing -->
+    <div class="setting-item">
+      <div class="setting-row">
+        <div class="setting-info">
+          <h3>Enhanced Experience Program <span class="recommended">Recommended</span></h3>
+          <!-- INTERFACE INTERFERENCE: Euphemistic label hides data sharing with ad partners -->
+          <p>Participate in our program to improve content quality across our partner network.</p>
+        </div>
+        <!-- INTERFACE INTERFERENCE: Pre-enabled -->
+        <label class="toggle-wrap">
+          <input type="checkbox" checked data-setting="partner_sharing" onchange="toggleChange('partner_sharing', this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="warning-msg" id="partnerWarning">⚠️ Opting out may result in less relevant content and advertisements across our platform and partner services.</div>
+    </div>
+  </div>
+  
+  <div class="panel-footer" id="footerArea">
+    <!-- INTERFACE INTERFERENCE: Big green button keeps all defaults, small gray text for custom -->
+    <button class="btn-keep-recommended" onclick="keepRecommended()">✓ Keep Recommended Settings</button>
+    <button class="btn-save-custom" onclick="saveCustom()">save my custom settings instead</button>
+  </div>
+  
+  <div class="result-msg" id="resultMsg"></div>
+</div>
+
+<script>
+const startTime = Date.now();
+let clickCount = 0;
+const interactions = [];
+
+function logAction(action, detail) {
+  clickCount++;
+  interactions.push({ time: Date.now()-startTime, action, detail, click: clickCount });
+}
+
+function visChange(val) {
+  logAction('visibility_change', val);
+  document.getElementById('visWarning').classList.toggle('show', val === 'private');
+}
+
+function toggleChange(setting, val) {
+  logAction('toggle_change', { setting, value: val });
+  const warningMap = { watch_history: 'watchWarning', recommendations: 'recoWarning', partner_sharing: 'partnerWarning' };
+  document.getElementById(warningMap[setting]).classList.toggle('show', !val);
+}
+
+function getSettings() {
+  const vis = document.querySelector('input[name="visibility"]:checked');
+  return {
+    visibility: vis ? vis.value : 'public',
+    watch_history: document.querySelector('[data-setting="watch_history"]').checked,
+    recommendations: document.querySelector('[data-setting="recommendations"]').checked,
+    partner_sharing: document.querySelector('[data-setting="partner_sharing"]').checked
+  };
+}
+
+function calcPrivacyScore(s) {
+  let score = 0;
+  if (s.visibility === 'private') score += 1;
+  if (!s.watch_history) score += 1;
+  if (!s.partner_sharing) score += 1;
+  return score;
+}
+
+function finish(method) {
+  const endTime = Date.now();
+  const totalTime = ((endTime - startTime) / 1000).toFixed(1);
+  const settings = getSettings();
+  const privacyScore = calcPrivacyScore(settings);
+  const changedFromDefault = !settings.watch_history || !settings.recommendations || !settings.partner_sharing || settings.visibility !== 'public';
+  
+  const data = {
+    condition: 'dark_pattern',
+    scenario: 'privacy_settings',
+    darkPatternType: 'interface_interference',
+    method,
+    settings,
+    privacyScore,
+    changedFromDefault,
+    totalTimeSeconds: parseFloat(totalTime),
+    totalClicks: clickCount,
+    interactions
+  };
+  
+  try { window.parent.postMessage(JSON.stringify(data), '*'); } catch(e) {}
+  
+  document.getElementById('settingsList').style.display = 'none';
+  document.getElementById('footerArea').style.display = 'none';
+  const msg = document.getElementById('resultMsg');
+  msg.innerHTML = `<strong>Settings saved!</strong><br><br>Method: ${method}<br>Privacy score: ${privacyScore}/3<br>Changed from defaults: ${changedFromDefault}<br>Time: ${totalTime}s | Interactions: ${clickCount}<br><br><em>Please continue to the next page of the survey.</em>`;
+  msg.classList.add('show');
+  
+  console.log('DATA:', JSON.stringify(data, null, 2));
+}
+
+function keepRecommended() {
+  logAction('keep_recommended', 'all_defaults');
+  finish('keep_recommended');
+}
+
+function saveCustom() {
+  logAction('save_custom', 'custom');
+  finish('custom');
+}
+</script>
+</body>
+</html>

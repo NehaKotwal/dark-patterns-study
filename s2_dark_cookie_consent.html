@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Smart - Cookies</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .banner {
+    width: 480px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .banner-header {
+    padding: 24px 24px 16px;
+  }
+  
+  .banner-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+  
+  .banner-header p {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+  }
+  
+  /* SNEAKING: Cookie details hidden by default, hard to find */
+  .customize-section {
+    display: none;
+    padding: 0 24px 16px;
+  }
+  .customize-section.show { display: block; }
+  
+  .cookie-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .cookie-item:last-child { border-bottom: none; }
+  
+  .cookie-info { flex: 1; margin-right: 12px; }
+  .cookie-info h3 { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .cookie-info p { font-size: 11px; color: #999; line-height: 1.3; }
+  
+  /* SNEAKING: Labels are deliberately vague */
+  
+  .cookie-check {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .cookie-check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #4A90D9;
+  }
+  
+  .banner-actions {
+    padding: 16px 24px 20px;
+  }
+  
+  /* SNEAKING: Giant green "Accept & Continue" button dominates */
+  .btn-accept {
+    width: 100%;
+    padding: 14px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 8px;
+  }
+  .btn-accept:hover { background: #1b5e20; }
+  
+  /* SNEAKING: "Customize" link is tiny gray text, easy to miss */
+  .btn-customize {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 4px;
+  }
+  .btn-customize:hover { color: #aaa; }
+  
+  .btn-save-custom {
+    width: 100%;
+    padding: 12px;
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 8px;
+  }
+  .btn-save-custom:hover { background: #e0e0e0; }
+  
+  /* SNEAKING: Fine print at the bottom */
+  .fine-print {
+    padding: 0 24px 16px;
+    font-size: 9px;
+    color: #ccc;
+    line-height: 1.4;
+  }
+  
+  .result-msg {
+    display: none;
+    text-align: center;
+    padding: 24px;
+    font-size: 14px;
+    color: #333;
+  }
+  .result-msg.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="banner" id="banner">
+  <div class="banner-header">
+    <h1>🍪 We value your experience</h1>
+    <p>We and our partners use cookies to ensure you get the best shopping experience. By continuing, you accept our use of cookies to personalize content and ads, provide social media features, and analyze traffic.</p>
+  </div>
+  
+  <!-- SNEAKING: Customize section hidden by default -->
+  <div class="customize-section" id="customizeSection">
+    <div class="cookie-item">
+      <div class="cookie-info">
+        <h3>Functional & Performance</h3>
+        <p>Improve site performance and remember preferences</p>
+      </div>
+      <div class="cookie-check">
+        <!-- SNEAKING: Pre-checked -->
+        <input type="checkbox" checked data-cat="analytics" onchange="logToggle('analytics', this.checked)">
+      </div>
+    </div>
+    
+    <div class="cookie-item">
+      <div class="cookie-info">
+        <h3>Personalization & Experience</h3>
+        <p>Customize content and product recommendations for you</p>
+      </div>
+      <div class="cookie-check">
+        <!-- SNEAKING: Pre-checked, vague label hides advertising purpose -->
+        <input type="checkbox" checked data-cat="advertising" onchange="logToggle('advertising', this.checked)">
+      </div>
+    </div>
+    
+    <div class="cookie-item">
+      <div class="cookie-info">
+        <h3>Social & Partner Integration</h3>
+        <p>Enable seamless sharing and partner features</p>
+      </div>
+      <div class="cookie-check">
+        <!-- SNEAKING: Pre-checked, hides "third-party data sharing" -->
+        <input type="checkbox" checked data-cat="thirdparty" onchange="logToggle('thirdparty', this.checked)">
+      </div>
+    </div>
+    
+    <button class="btn-save-custom" onclick="saveCustom()">Save preferences</button>
+  </div>
+  
+  <div class="banner-actions" id="actions">
+    <button class="btn-accept" onclick="acceptAll()">Accept & Continue Shopping →</button>
+    <button class="btn-customize" id="customizeBtn" onclick="showCustomize()">customize cookie preferences</button>
+  </div>
+  
+  <!-- SNEAKING: Fine print mentions data sharing buried at the bottom -->
+  <div class="fine-print" id="finePrint">
+    By clicking "Accept & Continue Shopping" you consent to the use of all cookies including those used for cross-site tracking, personalized advertising, and sharing data with our advertising partners. See our <u>Cookie Policy</u> for details.
+  </div>
+  
+  <div class="result-msg" id="resultMsg"></div>
+</div>
+
+<script>
+const startTime = Date.now();
+let clickCount = 0;
+const interactions = [];
+let customizeOpened = false;
+
+function logToggle(cat, val) {
+  clickCount++;
+  interactions.push({ time: Date.now()-startTime, action: 'toggle', category: cat, value: val, click: clickCount });
+}
+
+function getChoices() {
+  const cats = { essential: true };
+  document.querySelectorAll('[data-cat]').forEach(el => {
+    cats[el.dataset.cat] = el.checked;
+  });
+  return cats;
+}
+
+function showCustomize() {
+  clickCount++;
+  customizeOpened = true;
+  interactions.push({ time: Date.now()-startTime, action: 'open_customize', click: clickCount });
+  document.getElementById('customizeSection').classList.add('show');
+  document.getElementById('customizeBtn').style.display = 'none';
+}
+
+function finish(method) {
+  const endTime = Date.now();
+  const totalTime = ((endTime - startTime) / 1000).toFixed(1);
+  const choices = getChoices();
+  const accepted = Object.entries(choices).filter(([k,v]) => v && k !== 'essential').length;
+  
+  const data = {
+    condition: 'dark_pattern',
+    scenario: 'cookie_consent',
+    darkPatternType: 'sneaking',
+    method,
+    customizeOpened,
+    choices,
+    optionalCookiesAccepted: accepted,
+    totalTimeSeconds: parseFloat(totalTime),
+    totalClicks: clickCount,
+    interactions
+  };
+  
+  try { window.parent.postMessage(JSON.stringify(data), '*'); } catch(e) {}
+  
+  document.getElementById('customizeSection').classList.remove('show');
+  document.getElementById('actions').style.display = 'none';
+  document.getElementById('finePrint').style.display = 'none';
+  const msg = document.getElementById('resultMsg');
+  msg.innerHTML = `<strong>Preferences saved!</strong><br><br>Method: ${method}<br>Customize opened: ${customizeOpened}<br>Optional cookies accepted: ${accepted} of 3<br>Time: ${totalTime}s | Interactions: ${clickCount}<br><br><em>Please continue to the next page of the survey.</em>`;
+  msg.classList.add('show');
+  
+  console.log('DATA:', JSON.stringify(data, null, 2));
+}
+
+function acceptAll() {
+  clickCount++;
+  interactions.push({ time: Date.now()-startTime, action: 'accept_all', click: clickCount });
+  document.querySelectorAll('[data-cat]').forEach(el => el.checked = true);
+  finish('accept_all');
+}
+
+function saveCustom() {
+  clickCount++;
+  interactions.push({ time: Date.now()-startTime, action: 'save_custom', click: clickCount });
+  finish('custom');
+}
+</script>
+</body>
+</html>

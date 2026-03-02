@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Smart - Cookie Preferences</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .banner {
+    width: 480px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .banner-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .banner-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .banner-header p {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+  }
+  
+  .cookie-categories { padding: 16px 24px; }
+  
+  .cookie-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .cookie-item:last-child { border-bottom: none; }
+  
+  .cookie-info { flex: 1; margin-right: 16px; }
+  .cookie-info h3 { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; }
+  .cookie-info p { font-size: 12px; color: #888; line-height: 1.4; }
+  
+  .cookie-toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+  
+  .cookie-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #ccc;
+    border-radius: 26px;
+    transition: 0.3s;
+  }
+  
+  .slider::before {
+    content: '';
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+  
+  .cookie-toggle input:checked + .slider { background: #4A90D9; }
+  .cookie-toggle input:checked + .slider::before { transform: translateX(22px); }
+  .cookie-toggle input:disabled + .slider { background: #a0c4e8; cursor: default; }
+  .cookie-toggle input:disabled + .slider::before { transform: translateX(22px); }
+  
+  .required-badge {
+    font-size: 10px;
+    background: #e8f0fe;
+    color: #4A90D9;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  
+  .banner-actions {
+    padding: 16px 24px 24px;
+    display: flex;
+    gap: 12px;
+  }
+  
+  .btn-accept-all, .btn-reject-optional, .btn-save {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  
+  /* ETHICAL: All three buttons are equally sized and styled */
+  .btn-accept-all {
+    background: #4A90D9;
+    color: white;
+    border-color: #4A90D9;
+  }
+  .btn-accept-all:hover { background: #357ABD; }
+  
+  .btn-reject-optional {
+    background: white;
+    color: #4A90D9;
+    border-color: #4A90D9;
+  }
+  .btn-reject-optional:hover { background: #f0f6ff; }
+  
+  .btn-save {
+    background: #f5f5f5;
+    color: #333;
+    border-color: #ddd;
+  }
+  .btn-save:hover { background: #eee; }
+  
+  .result-msg {
+    display: none;
+    text-align: center;
+    padding: 24px;
+    font-size: 14px;
+    color: #333;
+  }
+  .result-msg.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="banner" id="banner">
+  <div class="banner-header">
+    <h1>🍪 Cookie Preferences</h1>
+    <p>Shop Smart uses cookies to provide essential website functions and to improve your experience. You have full control over which optional cookies to accept. Your choices will not affect your ability to browse the site.</p>
+  </div>
+  
+  <div class="cookie-categories" id="categories">
+    <div class="cookie-item">
+      <div class="cookie-info">
+        <h3>Essential Cookies <span class="required-badge">Required</span></h3>
+        <p>Necessary for the website to function. Cannot be disabled. Includes session management, security, and basic functionality.</p>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" checked disabled data-cat="essential">
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <div class="cookie-item">
+      <div class="cookie-info">
+        <h3>Analytics Cookies</h3>
+        <p>Help us understand how visitors interact with the website by collecting anonymous usage data.</p>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" data-cat="analytics" onchange="logToggle('analytics', this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <div class="cookie-item">
+      <div class="cookie-info">
+        <h3>Advertising Cookies</h3>
+        <p>Used to show you personalized advertisements based on your browsing habits across websites.</p>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" data-cat="advertising" onchange="logToggle('advertising', this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <div class="cookie-item">
+      <div class="cookie-info">
+        <h3>Third-Party Sharing</h3>
+        <p>Allow sharing of your browsing data with third-party partners for analytics and marketing purposes.</p>
+      </div>
+      <label class="cookie-toggle">
+        <input type="checkbox" data-cat="thirdparty" onchange="logToggle('thirdparty', this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+  
+  <div class="banner-actions" id="actions">
+    <button class="btn-accept-all" onclick="acceptAll()">Accept All</button>
+    <button class="btn-reject-optional" onclick="rejectOptional()">Essential Only</button>
+    <button class="btn-save" onclick="saveCustom()">Save My Choices</button>
+  </div>
+  
+  <div class="result-msg" id="resultMsg"></div>
+</div>
+
+<script>
+const startTime = Date.now();
+let clickCount = 0;
+const interactions = [];
+
+function logToggle(cat, val) {
+  clickCount++;
+  interactions.push({ time: Date.now()-startTime, action: 'toggle', category: cat, value: val, click: clickCount });
+}
+
+function getChoices() {
+  const cats = {};
+  document.querySelectorAll('[data-cat]').forEach(el => {
+    cats[el.dataset.cat] = el.checked;
+  });
+  return cats;
+}
+
+function finish(method) {
+  const endTime = Date.now();
+  const totalTime = ((endTime - startTime) / 1000).toFixed(1);
+  const choices = getChoices();
+  const accepted = Object.entries(choices).filter(([k,v]) => v && k !== 'essential').length;
+  
+  const data = {
+    condition: 'control',
+    scenario: 'cookie_consent',
+    method,
+    choices,
+    optionalCookiesAccepted: accepted,
+    totalTimeSeconds: parseFloat(totalTime),
+    totalClicks: clickCount,
+    interactions
+  };
+  
+  try { window.parent.postMessage(JSON.stringify(data), '*'); } catch(e) {}
+  
+  document.getElementById('categories').style.display = 'none';
+  document.getElementById('actions').style.display = 'none';
+  const msg = document.getElementById('resultMsg');
+  msg.innerHTML = `<strong>Preferences saved!</strong><br><br>Method: ${method}<br>Optional cookies accepted: ${accepted} of 3<br>Time: ${totalTime}s | Interactions: ${clickCount}<br><br><em>Please continue to the next page of the survey.</em>`;
+  msg.classList.add('show');
+  
+  console.log('DATA:', JSON.stringify(data, null, 2));
+}
+
+function acceptAll() {
+  clickCount++;
+  interactions.push({ time: Date.now()-startTime, action: 'accept_all', click: clickCount });
+  document.querySelectorAll('[data-cat]').forEach(el => { if (!el.disabled) el.checked = true; });
+  finish('accept_all');
+}
+
+function rejectOptional() {
+  clickCount++;
+  interactions.push({ time: Date.now()-startTime, action: 'reject_optional', click: clickCount });
+  document.querySelectorAll('[data-cat]').forEach(el => { if (!el.disabled) el.checked = false; });
+  finish('essential_only');
+}
+
+function saveCustom() {
+  clickCount++;
+  interactions.push({ time: Date.now()-startTime, action: 'save_custom', click: clickCount });
+  finish('custom');
+}
+</script>
+</body>
+</html>

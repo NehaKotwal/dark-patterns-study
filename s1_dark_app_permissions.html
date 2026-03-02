@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connect Hub - Permissions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .phone-frame {
+    width: 375px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .app-header {
+    background: linear-gradient(135deg, #4A90D9, #357ABD);
+    color: white;
+    padding: 28px 24px 20px;
+    text-align: center;
+  }
+  
+  .app-icon {
+    width: 56px; height: 56px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 14px;
+    margin: 0 auto 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+  
+  .app-header h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .app-header p { font-size: 13px; opacity: 0.85; }
+  
+  .permissions-list { padding: 16px 20px; }
+  
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    padding: 0 4px;
+  }
+  
+  .permission-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e8eaed;
+  }
+  
+  .perm-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-right: 14px;
+    flex-shrink: 0;
+  }
+  
+  .perm-icon.camera { background: #e3f2fd; }
+  .perm-icon.location { background: #fce4ec; }
+  .perm-icon.contacts { background: #e8f5e9; }
+  .perm-icon.microphone { background: #fff3e0; }
+  .perm-icon.photos { background: #f3e5f5; }
+  
+  .perm-info { flex: 1; margin-right: 12px; }
+  .perm-info h3 { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+  .perm-info p { font-size: 12px; color: #666; line-height: 1.4; }
+  
+  .perm-actions { flex-shrink: 0; }
+  
+  /* DARK PATTERN: Allow button is large and prominent */
+  .btn-allow {
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    background: #4A90D9;
+    color: white;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn-allow:hover { background: #357ABD; }
+  .btn-allow.selected { background: #2e7d32; }
+  
+  /* DARK PATTERN: "Manage" link is small, gray, and easy to miss */
+  .btn-manage {
+    display: block;
+    text-align: center;
+    margin-top: 5px;
+    font-size: 10px;
+    color: #bbb;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+    text-decoration: none;
+  }
+  .btn-manage:hover { color: #999; }
+  
+  .footer { padding: 16px 20px 24px; border-top: 1px solid #eee; }
+  
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: #4A90D9;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-submit:hover { background: #357ABD; }
+  .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+  
+  /* DARK PATTERN: Modal overlay for deny flow */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  
+  .modal {
+    background: white;
+    border-radius: 16px;
+    width: 320px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  
+  .modal-header {
+    padding: 20px 20px 12px;
+    text-align: center;
+  }
+  .modal-header h2 { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  
+  .modal-body {
+    padding: 0 20px 20px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.5;
+  }
+  
+  /* DARK PATTERN: Terms scroll box */
+  .terms-scroll {
+    max-height: 120px;
+    overflow-y: scroll;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 11px;
+    color: #888;
+    line-height: 1.6;
+    margin: 10px 0;
+  }
+  
+  .modal-actions {
+    padding: 0 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  /* DARK PATTERN: "Keep Allowed" is prominent, deny is minimal */
+  .modal-btn-keep {
+    width: 100%;
+    padding: 12px;
+    background: #4A90D9;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  
+  .modal-btn-deny {
+    width: 100%;
+    padding: 8px;
+    background: none;
+    color: #bbb;
+    border: none;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .modal-btn-deny:hover { color: #999; }
+
+  .confirm-modal .modal-body {
+    text-align: center;
+    color: #c62828;
+    font-weight: 500;
+  }
+
+  .denied-label {
+    display: none;
+    font-size: 11px;
+    color: #c62828;
+    font-weight: 600;
+    margin-top: 4px;
+    text-align: center;
+  }
+  .denied-label.show { display: block; }
+  
+  .result-msg {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+    color: #333;
+  }
+  .result-msg.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame" id="app">
+  <div class="app-header">
+    <div class="app-icon">🔗</div>
+    <h1>Connect Hub</h1>
+    <p>needs these permissions to give you the best experience</p>
+  </div>
+  
+  <div class="permissions-list" id="permList">
+    <div class="section-label">Required for full experience</div>
+    
+    <div class="permission-item" data-perm="camera">
+      <div class="perm-icon camera">📷</div>
+      <div class="perm-info">
+        <h3>Camera</h3>
+        <p>Take photos and videos for posts</p>
+      </div>
+      <div class="perm-actions">
+        <button class="btn-allow" onclick="allowPerm(this,'camera')">Allow</button>
+        <button class="btn-manage" onclick="openDeny('camera','Camera')">manage</button>
+        <div class="denied-label" id="denied-camera">Denied</div>
+      </div>
+    </div>
+    
+    <div class="permission-item" data-perm="location">
+      <div class="perm-icon location">📍</div>
+      <div class="perm-info">
+        <h3>Location (Always)</h3>
+        <p>Find events and people near you</p>
+      </div>
+      <div class="perm-actions">
+        <button class="btn-allow" onclick="allowPerm(this,'location')">Allow</button>
+        <button class="btn-manage" onclick="openDeny('location','Location (Always)')">manage</button>
+        <div class="denied-label" id="denied-location">Denied</div>
+      </div>
+    </div>
+    
+    <div class="permission-item" data-perm="contacts">
+      <div class="perm-icon contacts">👥</div>
+      <div class="perm-info">
+        <h3>Contacts</h3>
+        <p>Connect with friends already on the platform</p>
+      </div>
+      <div class="perm-actions">
+        <button class="btn-allow" onclick="allowPerm(this,'contacts')">Allow</button>
+        <button class="btn-manage" onclick="openDeny('contacts','Contacts')">manage</button>
+        <div class="denied-label" id="denied-contacts">Denied</div>
+      </div>
+    </div>
+    
+    <div class="permission-item" data-perm="microphone">
+      <div class="perm-icon microphone">🎙️</div>
+      <div class="perm-info">
+        <h3>Microphone</h3>
+        <p>Record audio for stories and calls</p>
+      </div>
+      <div class="perm-actions">
+        <button class="btn-allow" onclick="allowPerm(this,'microphone')">Allow</button>
+        <button class="btn-manage" onclick="openDeny('microphone','Microphone')">manage</button>
+        <div class="denied-label" id="denied-microphone">Denied</div>
+      </div>
+    </div>
+    
+    <div class="permission-item" data-perm="photos">
+      <div class="perm-icon photos">🖼️</div>
+      <div class="perm-info">
+        <h3>Photo Library</h3>
+        <p>Share your favorite memories</p>
+      </div>
+      <div class="perm-actions">
+        <button class="btn-allow" onclick="allowPerm(this,'photos')">Allow</button>
+        <button class="btn-manage" onclick="openDeny('photos','Photo Library')">manage</button>
+        <div class="denied-label" id="denied-photos">Denied</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer" id="footerArea">
+    <button class="btn-submit" id="submitBtn" onclick="submit()" disabled>Continue</button>
+  </div>
+  
+  <div class="result-msg" id="resultMsg"></div>
+</div>
+
+<!-- OBSTRUCTION MODAL: Step 1 - Terms & warning -->
+<div class="modal-overlay" id="denyModal1">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Manage <span id="denyPermName1"></span> Permission</h2>
+    </div>
+    <div class="modal-body">
+      Disabling this permission may significantly limit your experience. Please review our data usage policy before proceeding.
+      <div class="terms-scroll">
+        By modifying default permission settings, you acknowledge that: (a) certain features of Connect Hub may become unavailable or function with reduced capability; (b) Connect Hub collects permission-related preferences for service improvement purposes as described in our Privacy Policy Section 7.3.2; (c) re-enabling permissions later may require navigating to your device Settings > Apps > Connect Hub > Permissions; (d) some cached data related to previously granted permissions may be retained for up to 30 days after revocation pursuant to our data retention policy; (e) third-party integrations that rely on this permission may cease to function; (f) Connect Hub reserves the right to prompt you periodically to reconsider permission settings that affect core functionality; (g) by proceeding with denial, you accept these terms and conditions in full.
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-keep" onclick="keepAllowed()">Keep Allowed (Recommended)</button>
+      <button class="modal-btn-deny" onclick="showConfirm()">I still want to change this</button>
+    </div>
+  </div>
+</div>
+
+<!-- OBSTRUCTION MODAL: Step 2 - Are you sure? -->
+<div class="modal-overlay" id="denyModal2">
+  <div class="modal confirm-modal">
+    <div class="modal-header">
+      <h2>Are you sure?</h2>
+    </div>
+    <div class="modal-body">
+      Denying <strong><span id="denyPermName2"></span></strong> access means you won't be able to use key features. This action may affect your social experience.
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-keep" onclick="keepAllowed()">Allow Access</button>
+      <button class="modal-btn-deny" onclick="confirmDeny()">Deny permission</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const startTime = Date.now();
+const choices = {};
+let clickCount = 0;
+const interactions = [];
+let currentPerm = '';
+let currentPermName = '';
+
+function log(action, detail) {
+  clickCount++;
+  interactions.push({ time: Date.now() - startTime, action, detail, click: clickCount });
+}
+
+function allowPerm(btn, perm) {
+  log('allow', perm);
+  choices[perm] = 'allow';
+  btn.classList.add('selected');
+  btn.textContent = '✓ Allowed';
+  btn.nextElementSibling.style.display = 'none'; // hide manage
+  document.getElementById('denied-'+perm).classList.remove('show');
+  checkReady();
+}
+
+function openDeny(perm, permName) {
+  log('open_manage', perm);
+  currentPerm = perm;
+  currentPermName = permName;
+  document.getElementById('denyPermName1').textContent = permName;
+  document.getElementById('denyModal1').classList.add('show');
+}
+
+function keepAllowed() {
+  log('keep_allowed_from_modal', currentPerm);
+  closeModals();
+  // Auto-allow
+  choices[currentPerm] = 'allow';
+  const item = document.querySelector(`[data-perm="${currentPerm}"]`);
+  const btn = item.querySelector('.btn-allow');
+  btn.classList.add('selected');
+  btn.textContent = '✓ Allowed';
+  item.querySelector('.btn-manage').style.display = 'none';
+  document.getElementById('denied-'+currentPerm).classList.remove('show');
+  checkReady();
+}
+
+function showConfirm() {
+  log('proceed_to_confirm', currentPerm);
+  document.getElementById('denyModal1').classList.remove('show');
+  document.getElementById('denyPermName2').textContent = currentPermName;
+  document.getElementById('denyModal2').classList.add('show');
+}
+
+function confirmDeny() {
+  log('confirm_deny', currentPerm);
+  choices[currentPerm] = 'deny';
+  closeModals();
+  const item = document.querySelector(`[data-perm="${currentPerm}"]`);
+  const allowBtn = item.querySelector('.btn-allow');
+  allowBtn.classList.remove('selected');
+  allowBtn.textContent = 'Allow';
+  item.querySelector('.btn-manage').style.display = 'none';
+  document.getElementById('denied-'+currentPerm).classList.add('show');
+  checkReady();
+}
+
+function closeModals() {
+  document.getElementById('denyModal1').classList.remove('show');
+  document.getElementById('denyModal2').classList.remove('show');
+}
+
+function checkReady() {
+  const all = ['camera','location','contacts','microphone','photos'].every(p => choices[p]);
+  document.getElementById('submitBtn').disabled = !all;
+}
+
+function submit() {
+  const endTime = Date.now();
+  const totalTime = ((endTime - startTime) / 1000).toFixed(1);
+  const granted = Object.values(choices).filter(v => v === 'allow').length;
+  
+  const data = {
+    condition: 'dark_pattern',
+    scenario: 'app_permissions',
+    darkPatternType: 'obstruction',
+    choices,
+    permissionsGranted: granted,
+    permissionsDenied: 5 - granted,
+    totalTimeSeconds: parseFloat(totalTime),
+    totalClicks: clickCount,
+    interactions
+  };
+  
+  try { window.parent.postMessage(JSON.stringify(data), '*'); } catch(e) {}
+  
+  document.getElementById('permList').style.display = 'none';
+  document.getElementById('footerArea').style.display = 'none';
+  const msg = document.getElementById('resultMsg');
+  msg.innerHTML = `<strong>Choices saved!</strong><br><br>You allowed ${granted} of 5 permissions.<br>Time: ${totalTime}s | Interactions: ${clickCount}<br><br><em>Please continue to the next page of the survey.</em>`;
+  msg.classList.add('show');
+  
+  console.log('DATA:', JSON.stringify(data, null, 2));
+}
+</script>
+</body>
+</html>

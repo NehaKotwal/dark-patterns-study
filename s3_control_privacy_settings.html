@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stream View - Privacy Settings</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .settings-panel {
+    width: 420px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .panel-header {
+    background: #1a1a2e;
+    color: white;
+    padding: 24px;
+  }
+  
+  .panel-header .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  
+  .brand-icon {
+    width: 36px; height: 36px;
+    background: #e94560;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  
+  .panel-header h1 { font-size: 18px; font-weight: 700; }
+  .panel-header p { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+  
+  .settings-list { padding: 8px 24px; }
+  
+  .setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .setting-item:last-child { border-bottom: none; }
+  
+  .setting-info { flex: 1; margin-right: 16px; }
+  .setting-info h3 { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+  .setting-info p { font-size: 12px; color: #888; line-height: 1.4; }
+  
+  /* Radio group for profile visibility */
+  .radio-group { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+  }
+  .radio-group input { accent-color: #e94560; }
+  
+  .toggle-wrap {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+  
+  .toggle-wrap input { opacity: 0; width: 0; height: 0; }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #ccc;
+    border-radius: 26px;
+    transition: 0.3s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    height: 20px; width: 20px;
+    left: 3px; bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+  .toggle-wrap input:checked + .slider { background: #e94560; }
+  .toggle-wrap input:checked + .slider::before { transform: translateX(22px); }
+  
+  .panel-footer {
+    padding: 16px 24px 24px;
+    border-top: 1px solid #f0f0f0;
+  }
+  
+  .btn-save {
+    width: 100%;
+    padding: 14px;
+    background: #e94560;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-save:hover { background: #c81d45; }
+  
+  .result-msg {
+    display: none;
+    text-align: center;
+    padding: 24px;
+    font-size: 14px;
+    color: #333;
+  }
+  .result-msg.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="settings-panel" id="panel">
+  <div class="panel-header">
+    <div class="brand">
+      <div class="brand-icon">▶</div>
+      <h1>Stream View</h1>
+    </div>
+    <p>Review and update your privacy settings</p>
+  </div>
+  
+  <div class="settings-list" id="settingsList">
+    <div class="setting-item">
+      <div class="setting-info">
+        <h3>Profile Visibility</h3>
+        <p>Control who can see your profile, activity, and watchlists.</p>
+        <div class="radio-group">
+          <label><input type="radio" name="visibility" value="public" onchange="logChange('visibility','public')"> Public — Anyone can see your profile</label>
+          <label><input type="radio" name="visibility" value="friends" onchange="logChange('visibility','friends')"> Friends Only — Only people you follow</label>
+          <label><input type="radio" name="visibility" value="private" onchange="logChange('visibility','private')"> Private — Only you can see your profile</label>
+        </div>
+      </div>
+    </div>
+    
+    <div class="setting-item">
+      <div class="setting-info">
+        <h3>Watch History Sharing</h3>
+        <p>When enabled, your viewing activity can be seen by friends and may be used for social features like "Friends are watching."</p>
+      </div>
+      <label class="toggle-wrap">
+        <input type="checkbox" data-setting="watch_history" onchange="logChange('watch_history', this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <div class="setting-item">
+      <div class="setting-info">
+        <h3>Personalized Recommendations</h3>
+        <p>When enabled, your viewing patterns are analyzed to suggest content you might enjoy. This data stays within Stream View.</p>
+      </div>
+      <label class="toggle-wrap">
+        <input type="checkbox" data-setting="recommendations" onchange="logChange('recommendations', this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <div class="setting-item">
+      <div class="setting-info">
+        <h3>Partner Data Sharing</h3>
+        <p>When enabled, your viewing data and preferences may be shared with advertising and content partners for targeted marketing across platforms.</p>
+      </div>
+      <label class="toggle-wrap">
+        <input type="checkbox" data-setting="partner_sharing" onchange="logChange('partner_sharing', this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+  
+  <div class="panel-footer" id="footerArea">
+    <button class="btn-save" onclick="save()">Save Settings</button>
+  </div>
+  
+  <div class="result-msg" id="resultMsg"></div>
+</div>
+
+<script>
+const startTime = Date.now();
+let clickCount = 0;
+const interactions = [];
+
+function logChange(setting, value) {
+  clickCount++;
+  interactions.push({ time: Date.now()-startTime, action: 'change', setting, value, click: clickCount });
+}
+
+function getSettings() {
+  const vis = document.querySelector('input[name="visibility"]:checked');
+  return {
+    visibility: vis ? vis.value : 'none_selected',
+    watch_history: document.querySelector('[data-setting="watch_history"]').checked,
+    recommendations: document.querySelector('[data-setting="recommendations"]').checked,
+    partner_sharing: document.querySelector('[data-setting="partner_sharing"]').checked
+  };
+}
+
+function calcPrivacyScore(s) {
+  let score = 0;
+  if (s.visibility === 'private') score += 1;
+  if (!s.watch_history) score += 1;
+  if (!s.partner_sharing) score += 1;
+  // recommendations is neutral — not penalized
+  return score; // 0-3, higher = more private
+}
+
+function save() {
+  clickCount++;
+  const endTime = Date.now();
+  const totalTime = ((endTime - startTime) / 1000).toFixed(1);
+  const settings = getSettings();
+  const privacyScore = calcPrivacyScore(settings);
+  
+  const data = {
+    condition: 'control',
+    scenario: 'privacy_settings',
+    settings,
+    privacyScore,
+    totalTimeSeconds: parseFloat(totalTime),
+    totalClicks: clickCount,
+    interactions
+  };
+  
+  try { window.parent.postMessage(JSON.stringify(data), '*'); } catch(e) {}
+  
+  document.getElementById('settingsList').style.display = 'none';
+  document.getElementById('footerArea').style.display = 'none';
+  const msg = document.getElementById('resultMsg');
+  msg.innerHTML = `<strong>Settings saved!</strong><br><br>Privacy score: ${privacyScore}/3 (higher = more private)<br>Time: ${totalTime}s | Interactions: ${clickCount}<br><br><em>Please continue to the next page of the survey.</em>`;
+  msg.classList.add('show');
+  
+  console.log('DATA:', JSON.stringify(data, null, 2));
+}
+</script>
+</body>
+</html>
